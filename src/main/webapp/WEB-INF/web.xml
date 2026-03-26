@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+   version="6.0">
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         SESSION
+    ═══════════════════════════════════════════════════════════════ -->
+    <session-config>
+        <!-- 1440 minutes = 1 day server-side -->
+        <session-timeout>1440</session-timeout>
+        <cookie-config>
+            <!-- 86400 seconds = 1 day client-side (survive browser restart) -->
+            <max-age>86400</max-age>
+        </cookie-config>
+    </session-config>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         WELCOME PAGE
+    ═══════════════════════════════════════════════════════════════ -->
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         LISTENERS
+         Order: AppStartupListener (JPA init) → SessionActivityListener (login stats)
+    ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- 1. Application startup: initialises JPA -->
+    <listener>
+        <listener-class>listener.AppStartupListener</listener-class>
+    </listener>
+
+    <!-- 2. Session lifecycle: tracks active sessions, updates login stats -->
+    <listener>
+        <listener-class>listener.SessionActivityListener</listener-class>
+    </listener>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         FILTERS  (executed in declaration order)
+         1. CharacterEncoding  → must be first so params are decoded correctly
+         2. RequestLogging     → wraps the full chain for accurate timing
+         3. AuthFilter         → redirects unauthenticated users to login.jsp
+         4. RoleFilter         → blocks non-admin users from /admin/*
+         5. NoCacheFilter      → prevents browser caching of protected pages
+    ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- 1. CharacterEncodingFilter -->
+    <filter>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <filter-class>filter.CharacterEncodingFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>CharacterEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 2. RequestLoggingFilter -->
+    <filter>
+        <filter-name>RequestLoggingFilter</filter-name>
+        <filter-class>filter.RequestLoggingFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>RequestLoggingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 3. AuthFilter — Login check -->
+    <filter>
+        <filter-name>AuthFilter</filter-name>
+        <filter-class>filter.AuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/profile</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/admin</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthFilter</filter-name>
+        <url-pattern>/admin/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 4. RoleFilter — Admin-only access -->
+    <filter>
+        <filter-name>RoleFilter</filter-name>
+        <filter-class>filter.RoleFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>RoleFilter</filter-name>
+        <url-pattern>/admin</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>RoleFilter</filter-name>
+        <url-pattern>/admin/*</url-pattern>
+    </filter-mapping>
+
+    <!-- 5. NoCacheFilter — Prevent back-button after logout -->
+    <filter>
+        <filter-name>NoCacheFilter</filter-name>
+        <filter-class>filter.NoCacheFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>NoCacheFilter</filter-name>
+        <url-pattern>/profile</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>NoCacheFilter</filter-name>
+        <url-pattern>/admin</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>NoCacheFilter</filter-name>
+        <url-pattern>/admin/*</url-pattern>
+    </filter-mapping>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         ERROR PAGES
+    ═══════════════════════════════════════════════════════════════ -->
+    <error-page>
+        <error-code>403</error-code>
+        <location>/error403.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error404.jsp</location>
+    </error-page>
+
+</web-app>
