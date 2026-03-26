@@ -12,6 +12,10 @@ public interface AlgaeRecordService {
 
     List<AlgaeRecord> search(String keyword, String seqKeyword, Integer minLen, Integer maxLen);
 
+    List<AlgaeRecord> searchPaginated(String keyword, String seqKeyword, Integer minLen, Integer maxLen, int page, int pageSize);
+
+    long countSearch(String keyword, String seqKeyword, Integer minLen, Integer maxLen);
+
     boolean create(String speciesGroup, String signatureSequence);
 
     boolean update(int id, String speciesGroup, String signatureSequence);
