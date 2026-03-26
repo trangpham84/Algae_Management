@@ -24,22 +24,30 @@
                     <a href="${pageContext.request.contextPath}/admin" class="nav-link">Admin</a>
                 </c:if>
                 <div class="nav-divider">
-                    <c:if test="${sessionScope.user != null}">
-                        <a href="${pageContext.request.contextPath}/profile" class="nav-profile-link">
-                            <div id="navAvatar" class="nav-avatar" style="overflow:hidden;padding:0;">
-                                <c:choose>
-                                    <c:when test="${not empty sessionScope.user.profileImage}">
-                                        <img src="${sessionScope.user.profileImage}" style="width:100%;height:100%;object-fit:cover;" alt="avatar">
-                                    </c:when>
-                                    <c:otherwise>${sessionScope.user.username.substring(0,1).toUpperCase()}</c:otherwise>
-                                </c:choose>
-                            </div>
-                            <span class="nav-username">${sessionScope.user.username}</span>
-                        </a>
-                        <a href="${pageContext.request.contextPath}/auth?action=logout" class="nav-logout" title="Logout">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                        </a>
-                    </c:if>
+                    <c:choose>
+                        <c:when test="${sessionScope.user != null}">
+                            <a href="${pageContext.request.contextPath}/profile" class="nav-profile-link">
+                                <div id="navAvatar" class="nav-avatar" style="overflow:hidden;padding:0;">
+                                    <c:choose>
+                                        <c:when test="${not empty sessionScope.user.profileImage}">
+                                            <img src="${sessionScope.user.profileImage}" style="width:100%;height:100%;object-fit:cover;" alt="avatar">
+                                        </c:when>
+                                        <c:otherwise>${sessionScope.user.username.substring(0,1).toUpperCase()}</c:otherwise>
+                                    </c:choose>
+                                </div>
+                                <span class="nav-username">${sessionScope.user.username}</span>
+                            </a>
+                            <a href="${pageContext.request.contextPath}/auth?action=logout" class="nav-logout" title="Logout">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                            </a>
+                        </c:when>
+                        <c:otherwise>
+                            <a href="${pageContext.request.contextPath}/login.jsp" class="btn-login">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                                Login
+                            </a>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
             </nav>
         </div>
