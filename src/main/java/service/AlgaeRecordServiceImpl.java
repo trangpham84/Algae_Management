@@ -48,6 +48,18 @@ public class AlgaeRecordServiceImpl implements AlgaeRecordService {
     }
 
     @Override
+    public List<AlgaeRecord> searchPaginated(String keyword, String seqKeyword,
+            Integer minLen, Integer maxLen, int page, int pageSize) {
+        int offset = (page - 1) * pageSize;
+        return dao.searchPaginated(keyword, seqKeyword, minLen, maxLen, offset, pageSize);
+    }
+
+    @Override
+    public long countSearch(String keyword, String seqKeyword, Integer minLen, Integer maxLen) {
+        return dao.countSearch(keyword, seqKeyword, minLen, maxLen);
+    }
+
+    @Override
     public boolean create(String speciesGroup, String signatureSequence) {
         validateRecord(speciesGroup, signatureSequence);
         String seq = signatureSequence.trim().toUpperCase();
