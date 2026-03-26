@@ -74,6 +74,82 @@ public class AlgaeRecordDAO extends BaseDAO {
         }
     }
 
+    /**
+     * Server-side paginated search. Returns only the records for the given page.
+     */
+    public List<AlgaeRecord> searchPaginated(String keyword, String seqKeyword,
+            Integer minLen, Integer maxLen, int offset, int limit) {
+        EntityManager em = getEntityManager();
+        try {
+            StringBuilder jpql = new StringBuilder("SELECT a FROM AlgaeRecord a WHERE 1=1");
+            appendSearchConditions(jpql, keyword, seqKeyword, minLen, maxLen);
+            jpql.append(" ORDER BY a.recordID");
+
+            TypedQuery<AlgaeRecord> q = em.createQuery(jpql.toString(), AlgaeRecord.class);
+            setSearchParameters(q, keyword, seqKeyword, minLen, maxLen);
+            q.setFirstResult(offset);
+            q.setMaxResults(limit);
+            return q.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        } finally {
+            em.close();
+        }
+    }
+
+    /**
+     * Count total records matching the search criteria (for pagination).
+     */
+    public long countSearch(String keyword, String seqKeyword, Integer minLen, Integer maxLen) {
+        EntityManager em = getEntityManager();
+        try {
+            StringBuilder jpql = new StringBuilder("SELECT COUNT(a) FROM AlgaeRecord a WHERE 1=1");
+            appendSearchConditions(jpql, keyword, seqKeyword, minLen, maxLen);
+
+            TypedQuery<Long> q = em.createQuery(jpql.toString(), Long.class);
+            setSearchParameters(q, keyword, seqKeyword, minLen, maxLen);
+            return q.getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            em.close();
+        }
+    }
+
+    private void appendSearchConditions(StringBuilder jpql, String keyword, String seqKeyword,
+            Integer minLen, Integer maxLen) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            jpql.append(" AND LOWER(a.speciesGroup) LIKE :keyword");
+        }
+        if (seqKeyword != null && !seqKeyword.trim().isEmpty()) {
+            jpql.append(" AND UPPER(a.signatureSequence) LIKE :seqKeyword");
+        }
+        if (minLen != null) {
+            jpql.append(" AND a.nucleotides >= :minLen");
+        }
+        if (maxLen != null) {
+            jpql.append(" AND a.nucleotides <= :maxLen");
+        }
+    }
+
+    private void setSearchParameters(TypedQuery<?> q, String keyword, String seqKeyword,
+            Integer minLen, Integer maxLen) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            q.setParameter("keyword", "%" + keyword.trim().toLowerCase() + "%");
+        }
+        if (seqKeyword != null && !seqKeyword.trim().isEmpty()) {
+            q.setParameter("seqKeyword", "%" + seqKeyword.trim().toUpperCase() + "%");
+        }
+        if (minLen != null) {
+            q.setParameter("minLen", minLen);
+        }
+        if (maxLen != null) {
+            q.setParameter("maxLen", maxLen);
+        }
+    }
+
     public boolean create(AlgaeRecord record) {
         EntityManager em = getEntityManager();
         EntityTransaction tx = em.getTransaction();
