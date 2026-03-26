@@ -12,7 +12,7 @@ import java.io.IOException;
  * Redirects unauthenticated users to /login.jsp.
  */
 @WebFilter(urlPatterns = {
-        "/explore", "/profile",
+        "/profile",
         "/admin", "/admin/*"
 })
 public class AuthFilter implements Filter {
